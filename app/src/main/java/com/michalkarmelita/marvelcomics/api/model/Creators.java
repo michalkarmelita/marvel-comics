@@ -4,6 +4,8 @@ package com.michalkarmelita.marvelcomics.api.model;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
+import javax.inject.Inject;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -18,7 +20,7 @@ public class Creators {
     private String collectionURI;
     @SerializedName("items")
     @Expose
-    private List<Object> items = new ArrayList<Object>();
+    private List<Item> items = new ArrayList<Item>();
     @SerializedName("returned")
     @Expose
     private Integer returned;
@@ -64,7 +66,7 @@ public class Creators {
      * @return
      *     The items
      */
-    public List<Object> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
@@ -73,7 +75,7 @@ public class Creators {
      * @param items
      *     The items
      */
-    public void setItems(List<Object> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 

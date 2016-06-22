@@ -27,7 +27,7 @@ public class Result {
     private String variantDescription;
     @SerializedName("description")
     @Expose
-    private Object description;
+    private String description;
     @SerializedName("modified")
     @Expose
     private String modified;
@@ -193,7 +193,7 @@ public class Result {
      * @return
      *     The description
      */
-    public Object getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -202,7 +202,7 @@ public class Result {
      * @param description
      *     The description
      */
-    public void setDescription(Object description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 

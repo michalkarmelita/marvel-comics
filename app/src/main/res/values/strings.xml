@@ -3,4 +3,8 @@
     <string name="pages">Pages:</string>
     <string name="filter">Filter</string>
     <string name="budget_hint">Type your budget</string>
+    <string name="creators">Creators:</string>
+    <string name="description">Description:</string>
+    <string name="pages_details">Pages:</string>
+    <string name="price">Price:</string>
 </resources>

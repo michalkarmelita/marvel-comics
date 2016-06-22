@@ -13,6 +13,7 @@ public abstract class BasePresenter<T> {
 
     public void onCreate(T view) {
         this.view = view;
+        subscribe();
     }
 
     public void onDestroy() {
@@ -20,4 +21,6 @@ public abstract class BasePresenter<T> {
             subscription.unsubscribe();
         }
     }
+
+    protected abstract void subscribe();
 }

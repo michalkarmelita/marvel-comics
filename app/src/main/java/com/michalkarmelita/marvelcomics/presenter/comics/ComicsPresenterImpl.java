@@ -67,7 +67,7 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
                                     @Override
                                     public ComicAdapterItem call(Result result) {
                                         return new ComicAdapterItem(
-                                                result.getDigitalId(),
+                                                result.getId(),
                                                 result.getTitle(),
                                                 result.getPageCount(),
                                                 result.getPrices().get(0).getPrice(),
@@ -78,6 +78,7 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
                                         RxUtils.<BaseAdapterItem>addItemToList());
                     }
                 })
+                .cache()
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler);
 
@@ -153,17 +154,12 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
     }
 
     @Override
-    public void onCreate(ComicsView view) {
-        super.onCreate(view);
-        subscribe();
-    }
-
-    @Override
     public void setBudget(String budget) {
         budgetSubject.onNext(budget);
     }
 
-    private void subscribe() {
+    @Override
+    protected void subscribe() {
         subscription.add(comicsItemsObservable
                 .subscribe(new Action1<List<BaseAdapterItem>>() {
                     @Override

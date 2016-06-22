@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,6 +23,7 @@ import com.michalkarmelita.marvelcomics.utils.DialogUtils;
 import com.michalkarmelita.marvelcomics.view.comics.adapter.ComicsAdapter;
 import com.michalkarmelita.marvelcomics.view.comics.adapter.model.BaseAdapterItem;
 import com.michalkarmelita.marvelcomics.view.comics.adapter.model.HeaderItem;
+import com.michalkarmelita.marvelcomics.view.details.ComicDetailsActivity;
 
 import java.util.List;
 
@@ -43,12 +45,17 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
     ComicsPresenter presenter;
     @Inject
     ComicsAdapter adapter;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics);
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         presenter.onCreate(this);
 
@@ -106,7 +113,7 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
 
     @Override
     public void onComicClick(int itemId) {
-
+        startActivity(ComicDetailsActivity.newInstance(context, itemId));
     }
 
     @Override

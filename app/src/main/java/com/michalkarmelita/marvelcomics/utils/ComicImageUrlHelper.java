@@ -6,7 +6,7 @@ public class ComicImageUrlHelper {
         return baseUrl + "/standard_small." + extension;
     }
 
-    public static String getHeaderImageUrl(String baseUrl) {
-        return baseUrl + "landscape_amazing.jpg";
+    public static String getHeaderImageUrl(String baseUrl, String extension) {
+        return baseUrl + "/landscape_amazing." + extension;
     }
 }
