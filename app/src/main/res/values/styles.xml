@@ -8,4 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ComicTitleStyle">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginLeft">@dimen/comic_title_horizontal_spacing</item>
+        <item name="android:layout_marginRight">@dimen/comic_title_horizontal_spacing</item>
+        <item name="android:textSize">@dimen/comic_title_font_size</item>
+    </style>
+
 </resources>

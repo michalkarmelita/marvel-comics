@@ -1,5 +1,6 @@
 package com.michalkarmelita.marvelcomics.dagger.comics;
 
+import com.michalkarmelita.marvelcomics.dagger.ActivityModule;
 import com.michalkarmelita.marvelcomics.dagger.AppComponent;
 import com.michalkarmelita.marvelcomics.dagger.BaseActivityComponent;
 import com.michalkarmelita.marvelcomics.dagger.daggerscopes.ActivityScope;
@@ -10,7 +11,10 @@ import dagger.Component;
 @ActivityScope
 @Component(
         dependencies = AppComponent.class,
-        modules = ComicsActivityModule.class
+        modules = {
+                ActivityModule.class,
+                ComicsActivityModule.class
+        }
 )
 public interface ComicsActivityComponent extends BaseActivityComponent {
 

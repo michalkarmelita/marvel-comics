@@ -27,12 +27,6 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    public AuthInterceptor provideAuthInterceptor() {
-        return new AuthInterceptor();
-    }
-
-    @Provides
-    @Singleton
     public OkHttpClient provideOkHttpClient(HttpLoggingInterceptor loggingInterceptor, AuthInterceptor authInterceptor) {
         return new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
