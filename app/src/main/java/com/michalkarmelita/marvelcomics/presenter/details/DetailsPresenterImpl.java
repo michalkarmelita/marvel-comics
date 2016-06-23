@@ -10,6 +10,7 @@ import com.michalkarmelita.marvelcomics.api.model.Image;
 import com.michalkarmelita.marvelcomics.api.model.Item;
 import com.michalkarmelita.marvelcomics.api.model.Price;
 import com.michalkarmelita.marvelcomics.api.model.Result;
+import com.michalkarmelita.marvelcomics.api.model.Thumbnail;
 import com.michalkarmelita.marvelcomics.utils.ComicImageUrlHelper;
 import com.michalkarmelita.marvelcomics.view.details.ComicsDetailsView;
 
@@ -20,6 +21,7 @@ import rx.functions.Action2;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.subscriptions.CompositeSubscription;
 
 public class DetailsPresenterImpl extends BasePresenter<ComicsDetailsView> implements DetailsPresenter {
 
@@ -48,8 +50,13 @@ public class DetailsPresenterImpl extends BasePresenter<ComicsDetailsView> imple
                 .map(new Func1<Result, String>() {
                     @Override
                     public String call(Result result) {
-                        final Image image = result.getImages().get(0);
-                        return ComicImageUrlHelper.getHeaderImageUrl(image.getPath(), image.getExtension());
+                        if (result.getImages().size() > 0) {
+                            final Image image = result.getImages().get(0);
+                            return ComicImageUrlHelper.getHeaderImageUrl(image.getPath(), image.getExtension());
+                        } else {
+                            final Thumbnail thumbnail = result.getThumbnail();
+                            return ComicImageUrlHelper.getHeaderImageUrl(thumbnail.getPath(), thumbnail.getExtension());
+                        }
                     }
                 })
                 .observeOn(uiScheduler);
@@ -120,42 +127,43 @@ public class DetailsPresenterImpl extends BasePresenter<ComicsDetailsView> imple
 
     @Override
     protected void subscribe() {
-        subscription.add(comicImageObservable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                view.setImage(s);
-            }
-        }));
+        subscription = new CompositeSubscription(
+                comicImageObservable.subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        view.setImage(s);
+                    }
+                }),
 
-        subscription.add(comicTitleObservable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                view.setTitle(s);
-            }
-        }));
+                comicTitleObservable.subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        view.setTitle(s);
+                    }
+                }),
 
-        subscription.add(comicDescriptionObservable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String description) {
-                view.setDescription(description);
-            }
-        }));
+        comicDescriptionObservable.subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String description) {
+                        view.setDescription(description);
+                    }
+                }),
 
-        subscription.add(comicPagesObservable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String pages) {
-                view.setPages(pages);
-            }
-        }));
+        comicPagesObservable.subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String pages) {
+                        view.setPages(pages);
+                    }
+                }),
 
-        subscription.add(comicCreatorsObservable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String creators) {
-                view.setCreators(creators);
-            }
-        }));
+        comicCreatorsObservable.subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String creators) {
+                        view.setCreators(creators);
+                    }
+                }),
 
-        subscription.add(comicPriceObservable.subscribe(new Action1<String>() {
+        comicPriceObservable.subscribe(new Action1<String>() {
             @Override
             public void call(String price) {
                 view.setPrice(price);

@@ -2,6 +2,7 @@ package com.michalkarmelita.marvelcomics.dagger;
 
 
 import com.michalkarmelita.marvelcomics.dagger.daggerscopes.ActivityScope;
+import com.michalkarmelita.marvelcomics.presenter.details.DetailsPresenter;
 
 import dagger.Component;
 
@@ -13,4 +14,5 @@ import dagger.Component;
         }
 )
 public interface BaseActivityComponent {
+
 }

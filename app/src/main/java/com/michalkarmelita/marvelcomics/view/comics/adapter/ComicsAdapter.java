@@ -80,8 +80,16 @@ public class ComicsAdapter extends RecyclerView.Adapter<ComicsAdapterBaseViewHol
     }
 
     public void addItems(List<BaseAdapterItem> adapterItems) {
-        items.addAll(adapterItems);
-        notifyItemRangeChanged(items.size(), adapterItems.size());
+        if (items.size() > 0 && items.get(0) instanceof HeaderItem) {
+            BaseAdapterItem header = items.get(0);
+            items.clear();
+            items.add(header);
+            items.addAll(adapterItems);
+        } else {
+            items.clear();
+            items.addAll(adapterItems);
+        }
+        notifyDataSetChanged();
     }
 
     public void addHeader(HeaderItem header) {

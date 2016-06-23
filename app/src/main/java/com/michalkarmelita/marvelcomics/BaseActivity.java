@@ -8,11 +8,11 @@ import com.michalkarmelita.marvelcomics.dagger.BaseActivityComponent;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private BaseActivityComponent activityComponent;
+    protected BaseActivityComponent component;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        activityComponent = createActivityComponent();
+        component = createActivityComponent();
         super.onCreate(savedInstanceState);
     }
 
@@ -20,8 +20,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract BaseActivityComponent createActivityComponent();
 
     @NonNull
-    public BaseActivityComponent getActivityComponent() {
-        return activityComponent;
+    public BaseActivityComponent getComponent() {
+        return component;
     }
 
 }

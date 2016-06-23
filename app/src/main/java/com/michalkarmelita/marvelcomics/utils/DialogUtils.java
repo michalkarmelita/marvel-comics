@@ -11,17 +11,20 @@ import com.michalkarmelita.marvelcomics.R;
 
 public class DialogUtils {
 
-    public static void showInfoDialog(Context context, final BudgetListener budgetListener) {
+    public static void showInfoDialog(Context context, final BudgetListener budgetListener, String currentBudget) {
 
         final View view = LayoutInflater.from(context).inflate(R.layout.budget_dialog, null);
+        final EditText budget = (EditText) view.findViewById(R.id.budget);
+        if (currentBudget != null) {
+            budget.setText(currentBudget);
+        }
 
         final AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle("Set Budget")
+                .setTitle("Set Budget Filter")
                 .setView(view)
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        EditText budget = (EditText) view.findViewById(R.id.budget);
                         budgetListener.onSetBudget(budget.getText().toString());
                     }
                 })

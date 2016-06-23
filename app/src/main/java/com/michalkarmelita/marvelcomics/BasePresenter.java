@@ -5,19 +5,15 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class BasePresenter<T> {
 
     protected T view;
-    protected final CompositeSubscription subscription;
+    protected CompositeSubscription subscription;
 
-    public BasePresenter() {
-        this.subscription = new CompositeSubscription();
-    }
-
-    public void onCreate(T view) {
+    public void attachView(T view) {
         this.view = view;
         subscribe();
     }
 
-    public void onDestroy() {
-        if (!subscription.isUnsubscribed()) {
+    public void detachView() {
+        if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
     }

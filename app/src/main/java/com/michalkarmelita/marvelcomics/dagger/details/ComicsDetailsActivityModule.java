@@ -15,18 +15,10 @@ import rx.Scheduler;
 @Module
 public class ComicsDetailsActivityModule {
 
-    private final ComicsDetailsView view;
     private final String comicId;
 
-    public ComicsDetailsActivityModule(ComicsDetailsView view, String comicId) {
-        this.view = view;
+    public ComicsDetailsActivityModule(String comicId) {
         this.comicId = comicId;
-    }
-
-    @Provides
-    @ActivityScope
-    ComicsDetailsView provideComicsView() {
-        return view;
     }
 
     @Provides

@@ -22,19 +22,24 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
+import rx.subjects.BehaviorSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements ComicsPresenter {
 
     private static final int OFFSET = 20;
     private static final int LIMIT = 20;
+
     private final Observable<HeaderItem> pagesObservable;
     private final Observable<List<BaseAdapterItem>> comicsItemsObservable;
-    private final PublishSubject<String> budgetSubject = PublishSubject.create();
+    private final BehaviorSubject<String> budgetSubject = BehaviorSubject.create();
     private final Observable<List<BaseAdapterItem>> filteredItems;
 
     public ComicsPresenterImpl(final Scheduler networkScheduler, Scheduler uiScheduler, final MarvelApiService apiService) {
 
+        //I decided to use this "hack" is used to get exactly 100 items splitted to 5 API calls
+        //in order to present part of the data faster. Normally I would implement load more on scroll event
+        //something like here https://github.com/michalkarmelita/twitter-hashtags-tracker/blob/master/app/src/main/java/com/michalkarmelita/hashtagtracker/model/tweets/TweetsDataProvider.java
         final Observable<Integer> nextObservable = Observable.just(0, 1, 2, 3, 4);
 
         final Observable<List<Result>> apiResultsObservable = nextObservable
@@ -78,15 +83,19 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
                                         RxUtils.<BaseAdapterItem>addItemToList());
                     }
                 })
-                .cache()
+                .cacheWithInitialCapacity(1)
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler);
 
         filteredItems = budgetSubject
                 .map(new Func1<String, Integer>() {
                     @Override
-                    public Integer call(String s) {
-                        return Integer.valueOf(s);
+                    public Integer call(String budget) {
+                        if (budget.equals("")) {
+                            return Integer.MAX_VALUE;
+                        } else {
+                            return Integer.valueOf(budget);
+                        }
                     }
                 })
                 .flatMap(new Func1<Integer, Observable<List<BaseAdapterItem>>>() {
@@ -102,9 +111,11 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
 
                                 for (BaseAdapterItem baseAdapterItem : baseAdapterItems) {
                                     final ComicAdapterItem item = (ComicAdapterItem) baseAdapterItem;
+                                    priceSum += item.getPrice();
                                     if (priceSum < budget) {
                                         filtered.add(item);
-                                        priceSum += item.getPrice();
+                                    } else {
+                                        break;
                                     }
                                 }
 
@@ -116,7 +127,7 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
                 .subscribeOn(Schedulers.computation())
                 .observeOn(uiScheduler);
 
-        pagesObservable = Observable.merge(comicsItemsObservable, filteredItems)
+        pagesObservable = Observable.merge(comicsItemsObservable.last(), filteredItems)
                 .flatMap(new Func1<List<BaseAdapterItem>, Observable<String>>() {
                     @Override
                     public Observable<String> call(List<BaseAdapterItem> baseAdapterItems) {
@@ -159,24 +170,35 @@ public class ComicsPresenterImpl extends BasePresenter<ComicsView> implements Co
     }
 
     @Override
+    public String getCurrentBudget() {
+        if (budgetSubject.hasValue()) {
+            return budgetSubject.getValue();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     protected void subscribe() {
-        subscription.add(comicsItemsObservable
+
+        subscription = new CompositeSubscription(
+        comicsItemsObservable
                 .subscribe(new Action1<List<BaseAdapterItem>>() {
                     @Override
                     public void call(List<BaseAdapterItem> baseAdapterItems) {
                         view.updateComicsList(baseAdapterItems);
                     }
-                }));
+                }),
 
-        subscription.add(pagesObservable
+        pagesObservable
                 .subscribe(new Action1<HeaderItem>() {
                     @Override
                     public void call(HeaderItem headerItem) {
                         view.setPages(headerItem);
                     }
-                }));
+                }),
 
-        subscription.add(filteredItems.subscribe(new Action1<List<BaseAdapterItem>>() {
+        filteredItems.subscribe(new Action1<List<BaseAdapterItem>>() {
             @Override
             public void call(List<BaseAdapterItem> baseAdapterItems) {
                 view.setfilteredComicsList(baseAdapterItems);

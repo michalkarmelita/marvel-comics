@@ -4,8 +4,8 @@ import com.michalkarmelita.marvelcomics.view.details.ComicsDetailsView;
 
 public interface DetailsPresenter {
 
-    void onDestroy();
+    void detachView();
 
-    void onCreate(ComicsDetailsView view);
+    void attachView(ComicsDetailsView view);
 
 }

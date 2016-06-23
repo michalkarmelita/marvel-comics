@@ -2,7 +2,7 @@
     <string name="app_name">Marvel Comics</string>
     <string name="pages">Pages:</string>
     <string name="filter">Filter</string>
-    <string name="budget_hint">Type your budget</string>
+    <string name="budget_hint">Type budget</string>
     <string name="creators">Creators:</string>
     <string name="description">Description:</string>
     <string name="pages_details">Pages:</string>

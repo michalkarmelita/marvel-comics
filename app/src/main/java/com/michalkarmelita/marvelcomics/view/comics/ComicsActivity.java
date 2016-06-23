@@ -55,9 +55,7 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics);
         ButterKnife.bind(this);
-
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState == null) {
             presenter = component.presenter();

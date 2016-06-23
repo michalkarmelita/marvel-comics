@@ -4,10 +4,12 @@ import com.michalkarmelita.marvelcomics.view.comics.ComicsView;
 
 public interface ComicsPresenter {
 
-    void onDestroy();
+    void detachView();
 
-    void onCreate(ComicsView view);
+    void attachView(ComicsView view);
 
     void setBudget(String budget);
+
+    String getCurrentBudget();
 
 }

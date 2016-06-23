@@ -29,12 +29,6 @@ public class ComicsActivityModule {
 
     @Provides
     @ActivityScope
-    ComicsView provideComicsView() {
-        return view;
-    }
-
-    @Provides
-    @ActivityScope
     ComicsPresenter provideComicsPresenter(@NetworkScheduler Scheduler networkScheduler, @UiScheduler Scheduler uiScheduler, MarvelApiService apiService) {
         return new ComicsPresenterImpl(networkScheduler, uiScheduler, apiService);
     }
