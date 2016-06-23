@@ -8,6 +8,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +22,9 @@ import com.michalkarmelita.marvelcomics.dagger.daggerqualifiers.ForActivity;
 import com.michalkarmelita.marvelcomics.dagger.details.ComicsDetailsActivityComponent;
 import com.michalkarmelita.marvelcomics.dagger.details.ComicsDetailsActivityModule;
 import com.michalkarmelita.marvelcomics.dagger.details.DaggerComicsDetailsActivityComponent;
+import com.michalkarmelita.marvelcomics.presenter.comics.ComicsPresenter;
 import com.michalkarmelita.marvelcomics.presenter.details.DetailsPresenter;
+import com.michalkarmelita.marvelcomics.retain.RetainFragmentManager;
 
 import javax.inject.Inject;
 
@@ -51,43 +54,58 @@ public class ComicDetailsActivity extends BaseActivity implements ComicsDetailsV
     @Bind(R.id.details_creators)
     TextView detailsCreators;
 
-    @Inject
-    @ForActivity
-    Context context;
-
     public static Intent newInstance(Context context, int itemId) {
         return new Intent(context, ComicDetailsActivity.class)
                 .putExtra(ITEM_ID, String.valueOf(itemId));
     }
 
     @Inject
-    DetailsPresenter presenter;
+    @ForActivity
+    Context context;
+
+    private DetailsPresenter presenter;
+    protected ComicsDetailsActivityComponent component;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.details_activity);
         ButterKnife.bind(this);
-        presenter.onCreate(this);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        if (savedInstanceState == null) {
+            presenter = component.presenter();
+            RetainFragmentManager.setObject(DetailsPresenter.class.getCanonicalName(), getSupportFragmentManager(), presenter);
+        } else {
+            presenter = RetainFragmentManager.getObject(DetailsPresenter.class.getCanonicalName(), getSupportFragmentManager());
+        }
+
+        presenter.attachView(this);
 
     }
 
     @Override
     protected void onDestroy() {
-        presenter.onDestroy();
+        presenter.detachView();
         super.onDestroy();
     }
 
     @NonNull
     @Override
     protected BaseActivityComponent createActivityComponent() {
-        final ComicsDetailsActivityComponent component = DaggerComicsDetailsActivityComponent.builder()
+        component = DaggerComicsDetailsActivityComponent.builder()
                 .appComponent(App.getAppComponent(getApplication()))
                 .activityModule(new ActivityModule(this))
-                .comicsDetailsActivityModule(new ComicsDetailsActivityModule(this, getIntent().getStringExtra(ITEM_ID)))
+                .comicsDetailsActivityModule(new ComicsDetailsActivityModule(getIntent().getStringExtra(ITEM_ID)))
                 .build();
         component.inject(this);
         return component;
@@ -100,6 +118,8 @@ public class ComicDetailsActivity extends BaseActivity implements ComicsDetailsV
                 .fitCenter()
                 .into(toolbarBg);
     }
+
+
 
     @Override
     public void setTitle(String title) {

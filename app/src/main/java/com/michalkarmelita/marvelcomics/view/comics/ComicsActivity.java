@@ -19,6 +19,7 @@ import com.michalkarmelita.marvelcomics.dagger.comics.ComicsActivityModule;
 import com.michalkarmelita.marvelcomics.dagger.comics.DaggerComicsActivityComponent;
 import com.michalkarmelita.marvelcomics.dagger.daggerqualifiers.ForActivity;
 import com.michalkarmelita.marvelcomics.presenter.comics.ComicsPresenter;
+import com.michalkarmelita.marvelcomics.retain.RetainFragmentManager;
 import com.michalkarmelita.marvelcomics.utils.DialogUtils;
 import com.michalkarmelita.marvelcomics.view.comics.adapter.ComicsAdapter;
 import com.michalkarmelita.marvelcomics.view.comics.adapter.model.BaseAdapterItem;
@@ -35,6 +36,8 @@ import butterknife.ButterKnife;
 
 public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAdapter.ComicClickListener, DialogUtils.BudgetListener {
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
     @Bind(R.id.comics_recycler_view)
     RecyclerView comicsRecyclerView;
 
@@ -42,11 +45,10 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
     @ForActivity
     Context context;
     @Inject
-    ComicsPresenter presenter;
-    @Inject
     ComicsAdapter adapter;
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
+
+    private ComicsPresenter presenter;
+    private ComicsActivityComponent component;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +59,14 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        presenter.onCreate(this);
+        if (savedInstanceState == null) {
+            presenter = component.presenter();
+            RetainFragmentManager.setObject(ComicsPresenter.class.getCanonicalName(), getSupportFragmentManager(), presenter);
+        } else {
+            presenter = RetainFragmentManager.getObject(ComicsPresenter.class.getCanonicalName(), getSupportFragmentManager());
+        }
+
+        presenter.attachView(this);
 
         comicsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         comicsRecyclerView.setAdapter(adapter);
@@ -66,14 +75,14 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
 
     @Override
     protected void onDestroy() {
-        presenter.onDestroy();
+        presenter.detachView();
         super.onDestroy();
     }
 
     @NonNull
     @Override
     protected BaseActivityComponent createActivityComponent() {
-        final ComicsActivityComponent component = DaggerComicsActivityComponent.builder()
+        component = DaggerComicsActivityComponent.builder()
                 .appComponent(App.getAppComponent(getApplication()))
                 .activityModule(new ActivityModule(this))
                 .comicsActivityModule(new ComicsActivityModule(this))
@@ -91,7 +100,7 @@ public class ComicsActivity extends BaseActivity implements ComicsView, ComicsAd
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.filter) {
-            DialogUtils.showInfoDialog(context, this);
+            DialogUtils.showInfoDialog(context, this, presenter.getCurrentBudget());
         }
         return super.onOptionsItemSelected(item);
     }
